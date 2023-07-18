@@ -18,6 +18,7 @@ public partial class Usuario
     public string Correo { get; set; } = null!;
 
     public string Contrasena { get; set; } = null!;
+    //public virtual ICollection<Curso> Cursos { get; set; } = new List<Usuario>();
 
     public virtual Role IdRolNavigation { get; set; } = null!;
 }
