@@ -32,17 +32,17 @@ namespace CursosLuis.Api.Controllers
         }
 
         [HttpDelete("EliminarUsuario")]
-        public async Task<IActionResult> Delete(UsuariosDTOs eliminarUser)
+        public async Task<IActionResult> Delete(UsuariosDTOs eliminarUsuario)
         {
-            var usuarios = await usuariosServices.Eliminar(eliminarUser);
+            var usuarios = await usuariosServices.Eliminar(eliminarUsuario);
             return Ok(usuarios);
         }
 
 
         [HttpPut("ActualizarUsuario")]
-        public async Task<IActionResult> Updated(UsuariosDTOs actUser)
+        public async Task<IActionResult> Updated(UsuariosDTOs actualizarUsuario)
         {
-            var usuarios = await usuariosServices.Actualizar(actUser);
+            var usuarios = await usuariosServices.Actualizar(actualizarUsuario);
             return Ok(usuarios);
         }
 
