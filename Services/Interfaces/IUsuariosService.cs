@@ -1,4 +1,5 @@
-﻿using CursosLuis.Api.Model;
+﻿using CursosLuis.Api.DTOs;
+using CursosLuis.Api.Model;
 
 namespace CursosLuis.Api.Services.Interfaces
 {
@@ -6,10 +7,15 @@ namespace CursosLuis.Api.Services.Interfaces
     {
         #region
         Task<List<Usuario>> Obtener();
+        Task<bool> Agregar(UsuariosDTOs agregarUsuario);
+        Task<bool> Eliminar(UsuariosDTOs eliminarUsuario);
+        Task<bool> Actualizar(UsuariosDTOs actualizarUsuario);
+
+
         #endregion
-        
-       
-        
+
+
+
 
     }
 }
