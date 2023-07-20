@@ -112,7 +112,7 @@ namespace CursosLuis.Api.Services
                 await dtx.Usuarios.AddAsync(existe);
                 await dtx.SaveChangesAsync();
                 modelo.Id = existe.Id;
-                respuesta.Mensaje = "Se creo el usuario correctamente";
+                respuesta.Mensaje = "Se creo el usuario correctamente.";
                 respuesta.Valido = true;
             }
             catch (Exception e)
