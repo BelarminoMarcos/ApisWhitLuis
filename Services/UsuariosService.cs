@@ -13,151 +13,131 @@ namespace CursosLuis.Api.Services
         private readonly CursoDbContext dtx;
         #endregion
 
-        #region "Contructor"
-        public UsuariosService(CursoDbContext dtx) {
+        #region "Constructor"
+        public UsuariosService(CursoDbContext dtx)
+        {
             this.dtx = dtx;
         }
         #endregion
 
-
-        #region "Metodo"
-        public async Task<List<Usuario>> Obtener() => await dtx.Usuarios.ToListAsync();
-
-
-        public async Task<bool> Agregar(UsuariosDTOs crearUsuario)
+        #region "Métodos"
+        /// <summary>
+        /// Comprueba que el usuario exista.
+        /// No se actualiza el correo.
+        /// </summary>
+        public async Task<RespuestaGenerica<object>> Actualizar(UsuariosDTOs modelo)
         {
-            Usuario registrado = new Usuario
+            RespuestaGenerica<object> respuesta = new()
             {
-                IdRol = crearUsuario.IdRol,
-                Nombre = crearUsuario.Nombre,
-                Apellidos = crearUsuario.Apellidos,
-                FechaDeNacimiento = crearUsuario.FechaDeNacimiento,
-                Correo = crearUsuario.Correo,
-                Contrasena = crearUsuario.Contrasena,
-           
+                Mensaje = "El usuario no existe"
             };
-            var registroUser = dtx.Usuarios.Add(registrado);
-            await dtx.SaveChangesAsync();
-            return true;
+            try
+            {
+                Usuario? existe = await dtx.Usuarios.Where(x => x.Id == modelo.Id).FirstOrDefaultAsync();
+                if (existe == null)
+                {
+                    return respuesta;
+                }
+
+                existe.Nombre = modelo.Nombre;
+                existe.IdRol = modelo.IdRol;
+                existe.Apellidos = modelo.Apellidos;
+                existe.Contrasena = modelo.Contrasena;
+                existe.FechaDeNacimiento = modelo.FechaDeNacimiento;
+                dtx.Usuarios.Update(existe);
+                await dtx.SaveChangesAsync();
+                respuesta.Mensaje = "Se actualizo el usuario correctamente";
+                respuesta.Objeto = modelo;
+                respuesta.Valido = true;
+            }
+            catch (Exception e)
+            {
+                respuesta.Mensaje = e.Message;
+            }
+            return respuesta;
         }
 
-
-        public async Task<bool> Actualizar(UsuariosDTOs actualizarUsuario)
+        public async Task<RespuestaGenerica<UsuariosDTOs>> Eliminar(int id)
         {
-            Usuario actualizando = new Usuario
+            RespuestaGenerica<UsuariosDTOs> respuesta = new()
             {
-                IdRol = actualizarUsuario.IdRol,
-                Id = actualizarUsuario.Id,
-                Nombre = actualizarUsuario.Nombre,
-                Apellidos = actualizarUsuario.Apellidos,
-                FechaDeNacimiento = actualizarUsuario.FechaDeNacimiento,
-                Correo = actualizarUsuario.Correo,
-                Contrasena = actualizarUsuario.Contrasena,
-            
+                Mensaje = "El usuario no existe"
             };
-            var actualizado = dtx.Usuarios.Update(actualizando);
-            await dtx.SaveChangesAsync();
-            return true;
+            try
+            {
+                Usuario? existe = await dtx.Usuarios.Where(x => x.Id == id).FirstOrDefaultAsync();
+                if (existe == null)
+                {
+                    return respuesta;
+                }
+
+                dtx.Usuarios.Remove(existe);
+                await dtx.SaveChangesAsync();
+                respuesta.Mensaje = "Se elimino el usuario correctamente";
+                respuesta.Objeto = new UsuariosDTOs(existe.Id, existe.IdRol, existe.Nombre, existe.Apellidos, existe.FechaDeNacimiento, existe.Contrasena, existe.Contrasena);
+                respuesta.Valido = true;
+            }
+            catch (Exception e)
+            {
+                respuesta.Mensaje = e.Message;
+            }
+            return respuesta;
         }
 
-        public async Task<bool> Eliminar(UsuariosDTOs eliminarUsuario)
+        public async Task<RespuestaGenerica<object>> Agregar(UsuariosDTOs modelo)
         {
-            Usuario eliminado = new Usuario
+            RespuestaGenerica<object> respuesta = new()
             {
-                Id = eliminarUsuario.Id
+                Mensaje = "Existe un usuario con la misma información"
             };
-            var eliminar = dtx.Usuarios.Remove(eliminado);
-            await dtx.SaveChangesAsync();
-            return true;
+            try
+            {
+                Usuario? existe = await dtx.Usuarios
+                    .Where(x => x.Correo.ToLower() == modelo.Correo.ToLower()).FirstOrDefaultAsync();
+                if (existe != null)
+                {
+                    return respuesta;
+                }
+
+                existe = new Usuario
+                {
+                    Id = modelo.Id,
+                    Apellidos = modelo.Apellidos,
+                    Contrasena = modelo.Contrasena,
+                    Correo = modelo.Correo,
+                    FechaDeNacimiento = modelo.FechaDeNacimiento,
+                    IdRol = modelo.IdRol,
+                    Nombre = modelo.Nombre
+                };
+                await dtx.Usuarios.AddAsync(existe);
+                await dtx.SaveChangesAsync();
+                modelo.Id = existe.Id;
+                respuesta.Mensaje = "Se creo el usuario correctamente";
+                respuesta.Valido = true;
+            }
+            catch (Exception e)
+            {
+                respuesta.Mensaje = e.InnerException.Message;
+            }
+            return respuesta;
         }
 
-
-
-        //public async Task AgregarUsuarioAsync(Usuario nuevoUsuario)
-        //{
-        //    dtx.Usuarios.Add(nuevoUsuario);
-        //    await dtx.SaveChangesAsync();
-        //}
-        //public async Task<(int StatusCode, string Mensaje)> Create(UsuariosDTOs usuarios)
-        //{
-        //    try
-        //    {
-        //        var newUser = new Usuario
-        //        {
-
-        //            Id = usuarios.Id,
-        //            IdRol = usuarios.IdRol,
-        //            Nombre = usuarios.Nombre,
-        //            FechaDeNacimiento = usuarios.FechaDeNacimiento,
-        //            Correo = usuarios.Correo,
-        //            Contrasena = usuarios.Contrasena,
-        //           // IdRolNavigation = usuarios.IdRolNavigation
-        //        };
-        //        dtx.Add(newUser);
-        //        await dtx.SaveChangesAsync();
-        //        return (StatusCodes.Status201Created, "Registro exitoso");
-        //    }
-        //    catch
-        //    {
-        //        return (StatusCodes.Status500InternalServerError, "Error en el guardado");
-        //    }
-        //}
-
-
-        //public async Task<List<Usuario>> create() => await dtx.Usuarios.ToListAsync();
-
-
-
-
-        //public async Task<Usuario> Create(Usuario nuevoUsuario) Este es el bueno si no jala el de arriba
-        //{
-        //    dtx.Usuarios.Add(nuevoUsuario);
-        //    await dtx.SaveChangesAsync();
-        //    return (nuevoUsuario);
-        //}
-
-        //public async Task<( int StatusCode, string Mensaje)> Create(Usuario usuarios)
-        //{
-        //    try
-        //    {
-        //        var newUser = new Usuario
-        //        {
-
-        //            Id = usuarios.Id,
-        //            IdRol = usuarios.IdRol,
-        //            Nombre = usuarios.Nombre,
-        //            FechaDeNacimiento = usuarios.FechaDeNacimiento,
-        //            Correo = usuarios.Correo,
-        //            Contrasena = usuarios.Contrasena,
-        //            IdRolNavigation = usuarios.IdRolNavigation
-        //        };
-        //        dtx.Add(newUser);
-        //        await dtx.SaveChangesAsync();
-        //        return (StatusCodes.Status201Created, "Registro exitoso");
-        //    }
-        //    catch
-        //    {
-        //        return (StatusCodes.Status500InternalServerError, "Error en el guardado");
-        //    }
-        //}
-
-
-        //public async Task<List<Usuario>> Obtener()
-        //{
-        //    try
-        //    {
-        //        await Task.Delay(1000);
-        //        return dtx.Usuarios.ToList();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Console.WriteLine(e.ToString());
-        //        return new List<Usuario>();
-        //    }
-        //}
-        //{
-        //    return await dtx.Usuarios.ToListAsync();
-        //}
+        public async Task<RespuestaGenerica<List<UsuariosDTOs>>> Obtener()
+        {
+            RespuestaGenerica<List<UsuariosDTOs>> respuesta = new();
+            try
+            {
+                respuesta.Objeto = await dtx.Usuarios
+                    .Select(x => new UsuariosDTOs(x.Id, x.IdRol, x.Nombre, x.Apellidos, x.FechaDeNacimiento, x.Correo, x.Contrasena))
+                    .ToListAsync();
+                respuesta.Valido = true;
+            }
+            catch (Exception e)
+            {
+                respuesta.Mensaje = e.Message;
+            }
+            return respuesta;
+        }
         #endregion
     }
 }

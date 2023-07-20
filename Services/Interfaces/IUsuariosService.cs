@@ -6,10 +6,14 @@ namespace CursosLuis.Api.Services.Interfaces
     public interface IUsuariosService
     {
         #region
-        Task<List<Usuario>> Obtener();
-        Task<bool> Agregar(UsuariosDTOs agregarUsuario);
-        Task<bool> Eliminar(UsuariosDTOs eliminarUsuario);
-        Task<bool> Actualizar(UsuariosDTOs actualizarUsuario);
+        Task<RespuestaGenerica<List<UsuariosDTOs>>> Obtener();
+        Task<RespuestaGenerica<object>> Agregar(UsuariosDTOs agregarUsuario);
+
+        //Task<bool> Eliminar(UsuariosDTOs eliminarUsuario);
+        Task<RespuestaGenerica<UsuariosDTOs>> Eliminar(int id);
+        Task<RespuestaGenerica<object>> Actualizar(UsuariosDTOs actualizarUsuario);
+
+
 
 
         #endregion

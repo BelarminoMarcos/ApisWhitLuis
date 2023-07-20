@@ -17,29 +17,33 @@ namespace CursosLuis.Api.Controllers
         {
             this.usuariosServices = usuariosServices;
         }
-        [HttpGet("ObtenerUsuario")]
+        [HttpGet]
         public async Task<IActionResult> Get()
         {
             var usuarios = await usuariosServices.Obtener();
             return Ok(usuarios);
         }
 
-        [HttpPost("CrearUsuario")]
+        [HttpPost]
         public async Task<IActionResult> Post(UsuariosDTOs crearUsuario)
         {
             var usuarios = await usuariosServices.Agregar(crearUsuario);
             return Ok(usuarios);
         }
 
-        [HttpDelete("EliminarUsuario")]
-        public async Task<IActionResult> Delete(UsuariosDTOs eliminarUsuario)
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id)
         {
-            var usuarios = await usuariosServices.Eliminar(eliminarUsuario);
-            return Ok(usuarios);
+            var usuarios = await usuariosServices.Eliminar(id);
+            if (usuarios.Valido)
+            {
+                return Ok(usuarios);
+            }
+            return BadRequest(usuarios.Mensaje);
         }
 
 
-        [HttpPut("ActualizarUsuario")]
+        [HttpPut]
         public async Task<IActionResult> Updated(UsuariosDTOs actualizarUsuario)
         {
             var usuarios = await usuariosServices.Actualizar(actualizarUsuario);
