@@ -31,5 +31,23 @@ namespace CursosLuis.Api.Controllers
             var usuarios = await bitacoraService.AgregarP(creaBitacora);
             return Ok(usuarios);
         }
+
+        [HttpPut]
+        public async Task<IActionResult> Updated(BitacoraDTOs actualizarBitacora)
+        {
+            var usuarios = await bitacoraService.ActualizarB(actualizarBitacora);
+            return Ok(usuarios);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var usuarios = await bitacoraService.Eliminar(id);
+            if (usuarios.Valido)
+            {
+                return Ok(usuarios);
+            }
+            return BadRequest(usuarios.Mensaje);
+        }
     }
 }

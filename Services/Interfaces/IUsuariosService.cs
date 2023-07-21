@@ -12,14 +12,6 @@ namespace CursosLuis.Api.Services.Interfaces
         //Task<bool> Eliminar(UsuariosDTOs eliminarUsuario);
         Task<RespuestaGenerica<UsuariosDTOs>> Eliminar(int id);
         Task<RespuestaGenerica<object>> Actualizar(UsuariosDTOs actualizarUsuario);
-
-
-
-
         #endregion
-
-
-
-
     }
 }

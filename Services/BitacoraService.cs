@@ -73,5 +73,72 @@ namespace CursosLuis.Api.Services
         }
 
 
+        public async Task<RespuestaGenerica<object>> ActualizarB(BitacoraDTOs modelo)
+        {
+            RespuestaGenerica<object> respuesta = new()
+            {
+                Mensaje = "El usuario no existe"
+            };
+            try
+            {
+                Bitacora? existe = await dtx.Bitacoras.Where(x => x.Id == modelo.Id).FirstOrDefaultAsync();
+                if (existe == null)
+                {
+                    return respuesta;
+                }
+                existe.IdUsuario = modelo.IdUsuario;
+                existe.Fecha = modelo.Fecha;
+                existe.Accion = modelo.Accion;
+                existe.Modulo = modelo.Modulo;
+                existe.Descripcion = modelo.Descripcion;
+                dtx.Bitacoras.Update(existe);
+                await dtx.SaveChangesAsync();
+                respuesta.Mensaje = "Se actualizo el usuario correctamente";
+                respuesta.Objeto = modelo;
+                respuesta.Valido = true;
+            }
+            catch (Exception e)
+            {
+                respuesta.Mensaje = e.Message;
+            }
+            return respuesta;
+        }
+
+
+        public async Task<RespuestaGenerica<BitacoraDTOs>> Eliminar(int id)
+        {
+            RespuestaGenerica<BitacoraDTOs> respuesta = new()
+            {
+                Mensaje = "El usuario no existe"
+            };
+            try
+            {
+                Bitacora? existe = await dtx.Bitacoras.Where(x => x.Id == id).FirstOrDefaultAsync();
+                if (existe == null)
+                {
+                    return respuesta;
+                }
+                dtx.Bitacoras.Remove(existe);
+                await dtx.SaveChangesAsync();
+                respuesta.Mensaje = "Bitacora eliminada correctamente";
+                respuesta.Objeto = new BitacoraDTOs(existe.Id, existe.IdUsuario, existe.Fecha, existe.Accion,
+                existe.Modulo, existe.Descripcion);
+                respuesta.Valido = true;
+            }
+            catch (Exception e)
+            {
+                respuesta.Mensaje = e.Message;
+            }
+            return respuesta;
+        }
+
+
+
+
+
+
+
+
+
     }
 }

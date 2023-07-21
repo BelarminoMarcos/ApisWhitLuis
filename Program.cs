@@ -16,6 +16,12 @@ builder.Services.AddSwaggerGen();
 //builder.Services.AddIdentityCore<Secion>()//este se comenta para que jale
 //.AddRoles<IdentityRole>();//Este se comenta
 
+
+//builder.Services.AddIdentityCore<Secion>()         Estas tambien podemos borarlas si es que no jalan
+//    .AddRoles<IdentityRole>()
+//    .AddEntityFrameworkStores<CursoDbContext>();
+
+
 builder.Services.AddIdentity<Secion, IdentityRole>()//Esta y_______________En la configuración del servicio, utiliza AddIdentity en lugar de AddIdentityCore para configurar la autenticación y autorización, y luego usa AddEntityFrameworkStores para especificar el contexto de la base de datos:
     .AddEntityFrameworkStores<CursoDbContext>();//Esta debor borrarlas si no jala es mi implementacion
 builder.Services.AddAuthorization(o =>//esta Tambien se quita si no jala

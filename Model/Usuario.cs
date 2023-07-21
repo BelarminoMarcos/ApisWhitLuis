@@ -19,5 +19,7 @@ public partial class Usuario
 
     public string Contrasena { get; set; } = null!;
 
+    public virtual ICollection<Bitacora> Bitacoras { get; set; } = new List<Bitacora>();
+
     public virtual Role IdRolNavigation { get; set; } = null!;
 }
