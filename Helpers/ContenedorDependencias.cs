@@ -24,6 +24,7 @@ namespace CursosLuis.Api.Helpers
             services.AddScoped<IUsuariosService, UsuariosService>();//Se genera la instancia de la clase implementacion del metodo obtener
             services.AddScoped<IBitacoraService, BitacoraService>();//Se genera la instancia de la clase implementacion del metodo obtener
             services.AddScoped<IRoleService, RoleService>();//Se genera la instancia de la clase implementacion del metodo obtener
+            services.AddScoped<ICursosService, CursosService>();//Se genera la instancia de la clase implementacion del metodo obtener
             return services;
         }
         #endregion    
