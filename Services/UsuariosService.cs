@@ -74,7 +74,8 @@ namespace CursosLuis.Api.Services
                 dtx.Usuarios.Remove(existe);
                 await dtx.SaveChangesAsync();
                 respuesta.Mensaje = "Se elimino el usuario correctamente";
-                respuesta.Objeto = new UsuariosDTOs(existe.Id, existe.IdRol, existe.Nombre, existe.Apellidos, existe.FechaDeNacimiento, existe.Contrasena, existe.Contrasena);
+                respuesta.Objeto = new UsuariosDTOs(existe.Id, existe.IdRol, existe.Nombre, existe.Apellidos, 
+                existe.FechaDeNacimiento, existe.Contrasena, existe.Contrasena);
                 respuesta.Valido = true;
             }
             catch (Exception e)

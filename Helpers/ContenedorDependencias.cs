@@ -22,6 +22,7 @@ namespace CursosLuis.Api.Helpers
                 o.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
             services.AddScoped<IUsuariosService, UsuariosService>();//Se genera la instancia de la clase implementacion del metodo obtener
+            services.AddScoped<IBitacoraService, BitacoraService>();//Se genera la instancia de la clase implementacion del metodo obtener
             return services;
         }
         #endregion    
