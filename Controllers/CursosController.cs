@@ -52,15 +52,54 @@ namespace CursosLuis.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(CursoDTOS cr)
         {
-            var rergistrar = await cursosService.Agregar(cr);
-            return Ok(rergistrar);
+            //var rergistrar = await cursosService.Agregar(cr);
+            //return Ok(rergistrar);
+            var usuarios = await cursosService.Agregar(cr);
+            if (usuarios.Valido)
+            {
+                var role = User.Claims.Where(x => x.Type == ClaimTypes.Role).FirstOrDefault();
+                var email = User.Claims.Where(x => x.Type == ClaimTypes.Email).FirstOrDefault();
+                var claims = User.Claims.ToList();
+                int idUsuario = Convert.ToInt32(User.Identity.Name);
+                await bitacoraService.AgregarP(new DTOs.BitacoraDTOs()
+                {
+                    Accion = (byte)AccionesBitacoraEnum.Insertar,
+                    Descripcion = $"El usuario con  {email}  inserto un usuario",
+                    Fecha = DateTime.Now,
+                    IdUsuario = idUsuario,
+                    Modulo = (byte)ModulosBitacoraEnum.Cursos
+                });
+            }
+
+            return Ok(usuarios);
+
+
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(CursoDTOS usuario)
+        public async Task<IActionResult> Update(CursoDTOS cr)
         {
-            var Actualizar = await cursosService.Actualizar(usuario);
-            return Ok(Actualizar);
+            //var Actualizar = await cursosService.Actualizar(usuario);
+            //return Ok(Actualizar);
+
+            var usuarios = await cursosService.Actualizar(cr);
+            if (usuarios.Valido)
+            {
+                var role = User.Claims.Where(x => x.Type == ClaimTypes.Role).FirstOrDefault();
+                var email = User.Claims.Where(x => x.Type == ClaimTypes.Email).FirstOrDefault();
+                var claims = User.Claims.ToList();
+                int idUsuario = Convert.ToInt32(User.Identity.Name);
+                await bitacoraService.AgregarP(new DTOs.BitacoraDTOs()
+                {
+                    Accion = (byte)AccionesBitacoraEnum.Actualizar,
+                    Descripcion = $"El usuario con  {email}  inserto un usuario",
+                    Fecha = DateTime.Now,
+                    IdUsuario = idUsuario,
+                    Modulo = (byte)ModulosBitacoraEnum.Cursos
+                });
+            }
+
+            return Ok(usuarios);
 
         }
 
