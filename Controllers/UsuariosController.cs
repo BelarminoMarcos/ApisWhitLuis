@@ -32,22 +32,6 @@ namespace CursosLuis.Api.Controllers
         public async Task<IActionResult> Get()
         {
             var usuarios = await usuariosServices.Obtener();
-            if (usuarios.Valido)
-            {
-                var role = User.Claims.Where(x => x.Type == ClaimTypes.Role).FirstOrDefault();
-                var email = User.Claims.Where(x => x.Type == ClaimTypes.Email).FirstOrDefault();
-                var claims = User.Claims.ToList();
-                int idUsuario = Convert.ToInt32(User.Identity.Name);
-                await bitacoraService.AgregarP(new DTOs.BitacoraDTOs()
-                {
-                    Accion = (byte)AccionesBitacoraEnum.Obtener,
-                    Descripcion = $"El usuario {email} consulto la informacion de usuarios",
-                    Fecha = DateTime.Now,
-                    IdUsuario = idUsuario,
-                    Modulo = (byte)ModulosBitacoraEnum.Usuarios
-                });
-            }
-
             return Ok(usuarios);
         }
 
@@ -81,7 +65,6 @@ namespace CursosLuis.Api.Controllers
 
         }
 
-        //[Authorize]
         [HttpDelete]
         //public async Task<IActionResult> Delete(int id)
         //{
@@ -94,20 +77,10 @@ namespace CursosLuis.Api.Controllers
         //}
         public async Task<IActionResult> Delete(int id)
         {
-            var usuarios = await usuariosServices.Eliminar(id);
+            var usuarios = await usuariosServices.Eliminar(id)
+;
             if (usuarios.Valido)
-
             {
-                var claims = User.Claims.ToList();
-                int idUsuario = Convert.ToInt32(User.Identity.Name);
-                await bitacoraService.AgregarP(new DTOs.BitacoraDTOs()
-                {
-                    Accion = (byte)AccionesBitacoraEnum.Eliminar,
-                    Descripcion = $"Se elimino el usuario{usuarios.Objeto.Correo}",
-                    Fecha = DateTime.Now,
-                    IdUsuario = idUsuario,
-                    Modulo = (byte)ModulosBitacoraEnum.Usuarios
-                });
                 return Ok(usuarios);
             }
             return BadRequest(usuarios.Mensaje);
