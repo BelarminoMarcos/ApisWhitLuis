@@ -1,6 +1,10 @@
 ﻿using CursosLuis.Api.DTOs;
+using CursosLuis.Api.Helpers;
+using CursosLuis.Api.Services;
 using CursosLuis.Api.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CursosLuis.Api.Controllers
 {
@@ -9,10 +13,12 @@ namespace CursosLuis.Api.Controllers
     public class CursosController : ControllerBase
     {
         private readonly ICursosService cursosService;
+        private readonly IBitacoraService bitacoraService;//esta es la linea que agrege
 
-        public CursosController(ICursosService cursosService)
+        public CursosController(ICursosService cursosService, IBitacoraService bitacoraService)//agregue la bitacora
         {
             this.cursosService = cursosService;
+            this.bitacoraService = bitacoraService;
         }
 
 
@@ -20,8 +26,27 @@ namespace CursosLuis.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var roles = await cursosService.Obtener();
-            return Ok(roles);
+            //var roles = await cursosService.Obtener();
+            //return Ok(roles);
+            var usuarios = await cursosService.Obtener();
+            if (usuarios.Valido)
+            {
+                var role = User.Claims.Where(x => x.Type == ClaimTypes.Role).FirstOrDefault();
+                var email = User.Claims.Where(x => x.Type == ClaimTypes.Email).FirstOrDefault();
+                var claims = User.Claims.ToList();
+                int idUsuario = Convert.ToInt32(User.Identity.Name);
+                await bitacoraService.AgregarP(new DTOs.BitacoraDTOs()
+                {
+                    Accion = (byte)AccionesBitacoraEnum.Obtener,
+                    Descripcion = $"El usuario{email}consulto la informacion de usuarios",
+                    Fecha = DateTime.Now,
+                    IdUsuario = idUsuario,
+                    Modulo = (byte)ModulosBitacoraEnum.Cursos
+                });
+            }
+
+            return Ok(usuarios);
+
         }
 
         [HttpPost]
@@ -38,16 +63,37 @@ namespace CursosLuis.Api.Controllers
             return Ok(Actualizar);
 
         }
+
+        [Authorize]
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
-            var Eliminar = await cursosService.Eliminar(id)
-;
-            if (Eliminar.Valido)
+            //            var Eliminar = await cursosService.Eliminar(id)
+            //;
+            //            if (Eliminar.Valido)
+            //            {
+            //                return Ok(Eliminar);
+            //            }
+            //            return BadRequest(Eliminar.Mensaje);
+        
+            var usuarios = await cursosService.Eliminar(id);
+            if (usuarios.Valido)
+
             {
-                return Ok(Eliminar);
+                var claims = User.Claims.ToList();
+                int idUsuario = Convert.ToInt32(User.Identity.Name);
+                await bitacoraService.AgregarP(new DTOs.BitacoraDTOs()
+                {
+                    Accion = (byte)AccionesBitacoraEnum.Eliminar,
+                    Descripcion = $"Se elimino el usuario{usuarios.Objeto.Id}",
+                    Fecha = DateTime.Now,
+                    IdUsuario = idUsuario,
+                    Modulo = (byte)ModulosBitacoraEnum.Cursos
+                });
+                return Ok(usuarios);
             }
-            return BadRequest(Eliminar.Mensaje);
+            return BadRequest(usuarios.Mensaje);
+
 
         }
     }
